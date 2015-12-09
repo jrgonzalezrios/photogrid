@@ -14,17 +14,45 @@
 
 		$(document).on('click', '#doUpload',function(){
 			uploadNow();
-		})
+		});
 
 		var socket = io(host);
 
 		socket.on('status', function(data){
 			showStatus(data.msg, data.delay);
-		})
+		});
 
 		socket.on('doUpdate', function(){
-			render();
-		})
+			renderList();
+		});
+
+		function renderList(){
+			ajax({
+				url: host + '/getimages',
+				success: function(data){
+					var imagesList = JSON.parse(data.response);
+
+					imagesList.forEach(function(img){
+						var str = '<li>';
+							str += '<div class="overlay">';
+							str += '<div class="voteCtrl">';
+							str += '<a href="#" data-photoid="'+img._id+'" class="voteUp">';
+							str += '<img src="images/voteup.png" alt="Click Here to Vote Up !">';
+							str += '<h4>'+img.votes+'</h4>';
+							str += '</a>';
+							str += '</div>';
+							str += '</div>';
+							str += '<div class="imageHolder">';
+							str += '<img src="http://d16t0q7ssr3pxs.cloudfront.net/'+img.filename+'" alt="">';
+							str += '</div>';
+							str += '</li>';
+
+							$('.gallery ul').append(str);
+					})
+				}
+			})
+		}
+		renderList();
 
 		function uploadNow(){
 			$('.progress').fadeIn(100);
@@ -52,6 +80,17 @@
 
 			}
 		}
+
+		$(document).on('click', '.voteUp', function(e){
+			var that = $(this);
+			ajax({
+				url: host + '/voteup/' + that.data('photoid'),
+				success: function(data){
+					var parseData = JSON.parse(data.response);
+					that.find('h4').html(parseData.votes);
+				}
+			})
+		})
 	})
 	</script>
 
@@ -74,22 +113,8 @@
 		<div class="gallery">
 			<ul>
 				<!-- Repeat the following <li> structure for every image -->
-				<!-- <li>
-					<div class="overlay">
-					<div class="voteCtrl">
-						<a href="#" class="voteUp">
-							<img src="../images/voteup.png" alt="Click Here to Vote Up !">
-							<h4>100</h4>
-						</a>
-					</div>
-					</div>
-					<div class="imageHolder">
-						<img src="../images/someimage.jpg" alt="">
-					</div>
-				</li> -->
+				
 				<!-- End Repeat -->
-
-
 			</ul>
 		</div>
 	</div>
