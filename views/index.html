@@ -5,8 +5,55 @@
 	<title>PhotoGrid</title>
 	<link rel="stylesheet" href="../css/main.css">
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-	<script src="../js/photogrid_utils.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="/js/photogrid_utils.js"></script>
 
+	<script>
+	$(function(){
+		var host = '{{host}}';
+
+		$(document).on('click', '#doUpload',function(){
+			uploadNow();
+		})
+
+		var socket = io(host);
+
+		socket.on('status', function(data){
+			showStatus(data.msg, data.delay);
+		})
+
+		socket.on('doUpdate', function(){
+			render();
+		})
+
+		function uploadNow(){
+			$('.progress').fadeIn(100);
+			var uploadURL = host+ '/upload';
+			var uploadFile = $('.uploadPic');
+			if(uploadFile.val()!= ''){
+				var form = new FormData();
+				form.append("upload", uploadFile[0].files[0]);
+				// POST ajax request
+				ajax({
+					method: 'post',
+					url: uploadURL,
+					success: function(){
+						$('.progress').fadeOut(200);
+						uploadFile.val('');
+					},
+					progress: function(e){
+						if(e.lengthComputable){
+							var perc = Math.round((e.loaded*100)/e.total);
+							$('.progress').css('width',(perc + '%'))
+						}
+					},
+					payload: form
+				})
+
+			}
+		}
+	})
+	</script>
 
 </head>
 <body>

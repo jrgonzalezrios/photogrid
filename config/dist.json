@@ -1,0 +1,7 @@
+{
+	"host": "http://localhost:3000",
+	"S3AccessKey": "",
+	"S3Secret": "",
+	"S3Bucket": "jrgr-photogrid",
+	"dbURL": "mongodb://<user>:<password>@ds053964.mongolab.com:53964/jrgr-photogrid"
+}
